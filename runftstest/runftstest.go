@@ -6,30 +6,25 @@ import (
 	"io/ioutil"
 	"flag"
 	"strings"
-	_ "math/rand"
+	"math/rand"
 	"time"
 )
 
 func buildQuery(numPredicates int, equality bool) string {
 	template := `{"size":100,"query":{"must":{"conjuncts":[%s]}}}`
 	predicatesList := make([]string, numPredicates)
-	/*
+	
 	for i := 0; i < numPredicates; i++ {
 		fieldNum := rand.Intn(20) + 5
 		fieldVal := rand.Intn(100)
-		symbol := "="
-		predicate := fmt.Sprintf("+data.field%d: field%dval%v", fieldNum, symbol, fieldNum, fieldVal)
+		criterion := "term"
+		if !equality {
+			criterion = "min"
+		}
+		predicate := fmt.Sprintf(`{"%s":"field%dval%d", "field":"data.field%d"}`, criterion, fieldNum, fieldVal, fieldNum)
 		predicatesList[i] = predicate
 	}
-	*/
-	if equality {
-		predicatesList[0] = `{"term":"field19val69", "field":"data.field19"}`
-		predicatesList[1] = `{"term":"field0val0", "field":"data.field0"}`
-	} else {
-		predicatesList[0] = `{"min":"field19val98", "field":"data.field19"}`
-		predicatesList[1] = `{"min":"field0val1", "field":"data.field0"}`
-	}
-
+	
 	joinedPredicates := strings.Join(predicatesList, ",")
 	return fmt.Sprintf(template, joinedPredicates)
 }
